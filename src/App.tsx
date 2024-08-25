@@ -1,6 +1,6 @@
-import './App.css';
 import { useQuery } from '@tanstack/react-query';
 import { ModeToggle } from './components/mode-toggle';
+import { Card, CardContent } from './components/ui/card';
 
 async function getPikachu() {
     const url = 'https://pokeapi.co/api/v2/pokemon/25';
@@ -22,17 +22,31 @@ function Pikachu() {
     const query = useQuery({ queryKey: ['pikachu'], queryFn: getPikachu });
 
     if (!query.isSuccess) return;
-    return <img className="w-48 h-48" src={query.data.sprites.front_default} />;
+    return (
+        <Card>
+            <CardContent>
+                <img
+                    className="w-52 h-52"
+                    src={query.data.sprites.front_default}
+                />
+            </CardContent>
+        </Card>
+    );
 }
 
 function App() {
     return (
         <>
-            <div className="w-full flex flex-row justify-between">
-                <div />
+            <div className="w-full flex flex-row justify-between p-8">
+                <ModeToggle />
+                <div>
+                    <h1 className="text-3xl font-bold">Guess that Pokemon!</h1>
+                </div>
                 <ModeToggle />
             </div>
-            <div className="flex flex-col justify-center w-full">
+            <div className="flex justify-center w-full gap-5">
+                <Pikachu />
+                <Pikachu />
                 <Pikachu />
             </div>
         </>
