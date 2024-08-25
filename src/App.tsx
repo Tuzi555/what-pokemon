@@ -1,11 +1,21 @@
-import { useState } from 'react';
-import reactLogo from './assets/react.svg';
-import viteLogo from '/vite.svg';
-import './App.css';
 import { useQuery } from '@tanstack/react-query';
+import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
+import { useState } from 'react';
+import { Skeleton } from './components/ui/skeleton';
 
-async function getPikachu() {
-    const url = 'https://pokeapi.co/api/v2/pokemon/25';
+function getPokemonIds(): number[] {
+    const min = Math.ceil(1);
+    const max = Math.floor(152);
+    const first = Math.floor(Math.random() * (max - min + 1)) + min;
+    let second = Math.floor(Math.random() * (max - min + 1)) + min;
+    while (second === first) {
+        second = Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+    return [first, second];
+}
+
+async function getPokemon(id: number) {
+    const url = `https://pokeapi.co/api/v2/pokemon/${id}`;
     try {
         const response = await fetch(url);
         if (!response.ok) {
@@ -20,47 +30,61 @@ async function getPikachu() {
     }
 }
 
-function Pikachu() {
-    const query = useQuery({ queryKey: ['pikachu'], queryFn: getPikachu });
-
-    if (!query.isSuccess) return;
+function Pokemon({ imgUrl }: { imgUrl: string }) {
     return (
-        <a href="https://www.pokemon.com/us/pokedex/pikachu" target="_blank">
-            <img src={query.data.sprites.front_default} />
-        </a>
+        <Card className="bg-card hover:bg-primary">
+            <CardContent>
+                <img className="w-52 h-52" src={imgUrl} />
+            </CardContent>
+        </Card>
+    );
+}
+
+function PokemonSkeleton() {
+    return (
+        <Card className="bg-card hover:bg-primary">
+            <CardContent>
+                <div className="w-52 h-52" />
+            </CardContent>
+        </Card>
     );
 }
 
 function App() {
-    const [count, setCount] = useState(0);
+    const [pokemonIds, _] = useState(getPokemonIds);
+    const queryOne = useQuery({
+        queryKey: ['pokemon', pokemonIds[0]],
+        queryFn: () => getPokemon(pokemonIds[0]),
+    });
+    const queryTwo = useQuery({
+        queryKey: ['pokemon', pokemonIds[1]],
+        queryFn: () => getPokemon(pokemonIds[1]),
+    });
 
     return (
         <>
-            <div>
-                <a href="https://vitejs.dev" target="_blank">
-                    <img src={viteLogo} className="logo" alt="Vite logo" />
-                </a>
-                <a href="https://react.dev" target="_blank">
-                    <img
-                        src={reactLogo}
-                        className="logo react"
-                        alt="React logo"
-                    />
-                </a>
-                <Pikachu />
+            <div className="w-full flex flex-row justify-center p-8 border-b-primary border bg-accent">
+                <h1 className="text-4xl font-bold">What Pokemon?</h1>
             </div>
-            <h1>Vite + React</h1>
-            <div className="card">
-                <button onClick={() => setCount((count) => count + 1)}>
-                    count is {count}
-                </button>
-                <p>
-                    Edit <code>src/App.tsx</code> and save to test HMR
-                </p>
+            <div className="w-full flex flex-col items-center h-full mt-12">
+                <div className="flex justify-center bg-secondary rounded-md p-12 gap-12">
+                    {queryOne.isSuccess && queryTwo.isSuccess ? (
+                        <>
+                            <Pokemon
+                                imgUrl={queryOne.data.sprites.front_default}
+                            />
+                            <Pokemon
+                                imgUrl={queryTwo.data.sprites.front_default}
+                            />
+                        </>
+                    ) : (
+                        <>
+                            <PokemonSkeleton />
+                            <PokemonSkeleton />
+                        </>
+                    )}
+                </div>
             </div>
-            <p className="read-the-docs">
-                Click on the Vite and React logos to learn more
-            </p>
         </>
     );
 }
