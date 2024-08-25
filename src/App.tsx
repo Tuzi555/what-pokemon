@@ -1,9 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
-import { ModeToggle } from './components/mode-toggle';
 import { Card, CardContent } from './components/ui/card';
 
-async function getPikachu() {
-    const url = 'https://pokeapi.co/api/v2/pokemon/25';
+function getRandomInt() {
+    const min = Math.ceil(1);
+    const max = Math.floor(152);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+async function getPokemon(id: number) {
+    const url = `https://pokeapi.co/api/v2/pokemon/${id}`;
     try {
         const response = await fetch(url);
         if (!response.ok) {
@@ -18,12 +23,10 @@ async function getPikachu() {
     }
 }
 
-function Pikachu() {
-    const query = useQuery({ queryKey: ['pikachu'], queryFn: getPikachu });
-
+function Pokemon({ query }) {
     if (!query.isSuccess) return;
     return (
-        <Card>
+        <Card className="bg-card hover:bg-primary">
             <CardContent>
                 <img
                     className="w-52 h-52"
@@ -35,19 +38,26 @@ function Pikachu() {
 }
 
 function App() {
+    const one = getRandomInt();
+    const queryOne = useQuery({
+        queryKey: ['pokemon', one],
+        queryFn: () => getPokemon(one),
+    });
+    const two = getRandomInt();
+    const queryTwo = useQuery({
+        queryKey: ['pokemon', two],
+        queryFn: () => getPokemon(two),
+    });
     return (
         <>
-            <div className="w-full flex flex-row justify-between p-8">
-                <ModeToggle />
-                <div>
-                    <h1 className="text-3xl font-bold">Guess that Pokemon!</h1>
-                </div>
-                <ModeToggle />
+            <div className="w-full flex flex-row justify-center p-8 border-b-primary border bg-accent">
+                <h1 className="text-4xl font-bold">What Pokemon?</h1>
             </div>
-            <div className="flex justify-center w-full gap-5">
-                <Pikachu />
-                <Pikachu />
-                <Pikachu />
+            <div className="w-full flex flex-col items-center h-full mt-12">
+                <div className="flex justify-center bg-secondary rounded-md p-12 gap-12">
+                    <Pokemon query={queryOne} />
+                    <Pokemon query={queryTwo} />
+                </div>
             </div>
         </>
     );
