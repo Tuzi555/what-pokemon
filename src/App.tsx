@@ -1,10 +1,17 @@
 import { useQuery } from '@tanstack/react-query';
-import { Card, CardContent } from './components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
+import { useState } from 'react';
+import { Skeleton } from './components/ui/skeleton';
 
-function getRandomInt() {
+function getPokemonIds(): number[] {
     const min = Math.ceil(1);
     const max = Math.floor(152);
-    return Math.floor(Math.random() * (max - min + 1)) + min;
+    const first = Math.floor(Math.random() * (max - min + 1)) + min;
+    let second = Math.floor(Math.random() * (max - min + 1)) + min;
+    while (second === first) {
+        second = Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+    return [first, second];
 }
 
 async function getPokemon(id: number) {
@@ -23,31 +30,37 @@ async function getPokemon(id: number) {
     }
 }
 
-function Pokemon({ query }) {
-    if (!query.isSuccess) return;
+function Pokemon({ imgUrl }: { imgUrl: string }) {
     return (
         <Card className="bg-card hover:bg-primary">
             <CardContent>
-                <img
-                    className="w-52 h-52"
-                    src={query.data.sprites.front_default}
-                />
+                <img className="w-52 h-52" src={imgUrl} />
+            </CardContent>
+        </Card>
+    );
+}
+
+function PokemonSkeleton() {
+    return (
+        <Card className="bg-card hover:bg-primary">
+            <CardContent>
+                <div className="w-52 h-52" />
             </CardContent>
         </Card>
     );
 }
 
 function App() {
-    const one = getRandomInt();
+    const [pokemonIds, _] = useState(getPokemonIds);
     const queryOne = useQuery({
-        queryKey: ['pokemon', one],
-        queryFn: () => getPokemon(one),
+        queryKey: ['pokemon', pokemonIds[0]],
+        queryFn: () => getPokemon(pokemonIds[0]),
     });
-    const two = getRandomInt();
     const queryTwo = useQuery({
-        queryKey: ['pokemon', two],
-        queryFn: () => getPokemon(two),
+        queryKey: ['pokemon', pokemonIds[1]],
+        queryFn: () => getPokemon(pokemonIds[1]),
     });
+
     return (
         <>
             <div className="w-full flex flex-row justify-center p-8 border-b-primary border bg-accent">
@@ -55,8 +68,21 @@ function App() {
             </div>
             <div className="w-full flex flex-col items-center h-full mt-12">
                 <div className="flex justify-center bg-secondary rounded-md p-12 gap-12">
-                    <Pokemon query={queryOne} />
-                    <Pokemon query={queryTwo} />
+                    {queryOne.isSuccess && queryTwo.isSuccess ? (
+                        <>
+                            <Pokemon
+                                imgUrl={queryOne.data.sprites.front_default}
+                            />
+                            <Pokemon
+                                imgUrl={queryTwo.data.sprites.front_default}
+                            />
+                        </>
+                    ) : (
+                        <>
+                            <PokemonSkeleton />
+                            <PokemonSkeleton />
+                        </>
+                    )}
                 </div>
             </div>
         </>
