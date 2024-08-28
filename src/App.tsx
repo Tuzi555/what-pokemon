@@ -1,6 +1,6 @@
-import { useQuery } from '@tanstack/react-query';
-import { Card, CardContent } from './components/ui/card';
 import { useState } from 'react';
+import { Pokemon, PokemonSkeleton } from './components/pokemon';
+import { usePokemonQuery } from './queries/pokemon';
 
 function getPokemonIds(): number[] {
     const min = Math.ceil(1);
@@ -13,52 +13,10 @@ function getPokemonIds(): number[] {
     return [first, second];
 }
 
-async function getPokemon(id: number) {
-    const url = `https://pokeapi.co/api/v2/pokemon/${id}`;
-    try {
-        const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error(`Response status: ${response.status}`);
-        }
-        return await response.json();
-    } catch (error) {
-        if (error instanceof Error) console.error(error.message);
-        else {
-            console.error('Caught variable was not an instance of Error');
-        }
-    }
-}
-
-function Pokemon({ imgUrl }: { imgUrl: string }) {
-    return (
-        <Card className="bg-card hover:bg-primary">
-            <CardContent>
-                <img className="w-52 h-52" src={imgUrl} />
-            </CardContent>
-        </Card>
-    );
-}
-
-function PokemonSkeleton() {
-    return (
-        <Card className="bg-card hover:bg-primary">
-            <CardContent>
-                <div className="w-52 h-52" />
-            </CardContent>
-        </Card>
-    );
-}
-
 function App() {
     const [pokemonIds, _] = useState(getPokemonIds);
-    const queryOne = useQuery({
-        queryKey: ['pokemon', pokemonIds[0]],
-        queryFn: () => getPokemon(pokemonIds[0]),
-    });
-    const queryTwo = useQuery({
-        queryKey: ['pokemon', pokemonIds[1]],
-        queryFn: () => getPokemon(pokemonIds[1]),
-    });
+    const queryOne = usePokemonQuery(pokemonIds[0]);
+    const queryTwo = usePokemonQuery(pokemonIds[1]);
 
     return (
         <>
