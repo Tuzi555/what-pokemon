@@ -5,6 +5,7 @@ import './index.css';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { ThemeProvider } from './components/theme-provider.tsx';
+import { Toaster } from 'sonner';
 
 const queryClient = new QueryClient();
 
@@ -14,6 +15,7 @@ createRoot(document.getElementById('root')!).render(
             <ThemeProvider defaultTheme="dark">
                 <App />
                 <ReactQueryDevtools initialIsOpen={false} />
+                <Toaster />
             </ThemeProvider>
         </QueryClientProvider>
     </StrictMode>
