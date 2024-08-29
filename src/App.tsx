@@ -12,9 +12,21 @@ function App() {
 
     const handleAnswer = (isCorrect: boolean) => {
         if (isCorrect) {
-            toast('🎉 That is correct!');
+            toast.success(
+                <div className="flex flex-row justify-center w-full">
+                    <h1 className="text-center text-2xl">
+                        🎉 That is correct!
+                    </h1>
+                </div>
+            );
         } else {
-            toast('🫣 That is incorrect, try again!');
+            toast.error(
+                <div className="flex flex-row justify-center w-full">
+                    <h1 className="text-center text-2xl">
+                        🫣 That is incorrect, try again!
+                    </h1>
+                </div>
+            );
         }
 
         setPokemonIds(getPokemonIds);

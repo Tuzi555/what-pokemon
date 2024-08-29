@@ -15,7 +15,7 @@ createRoot(document.getElementById('root')!).render(
             <ThemeProvider defaultTheme="dark">
                 <App />
                 <ReactQueryDevtools initialIsOpen={false} />
-                <Toaster />
+                <Toaster position="bottom-center" richColors />
             </ThemeProvider>
         </QueryClientProvider>
     </StrictMode>
