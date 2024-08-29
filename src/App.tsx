@@ -6,12 +6,16 @@ import { toast } from 'sonner';
 
 function App() {
     const [pokemonIds, setPokemonIds] = useState(getPokemonIds);
+    const [streak, setStreak] = useState(0);
     const queryOne = usePokemonQuery(pokemonIds[0]);
     const queryTwo = usePokemonQuery(pokemonIds[1]);
     const firstOneIsTheOne = Math.round(Math.random()) === 0;
 
     const handleAnswer = (isCorrect: boolean) => {
         if (isCorrect) {
+            setStreak((value) => {
+                return value + 1;
+            });
             toast.success(
                 <div className="flex flex-row justify-center w-full">
                     <h1 className="text-center text-2xl">
@@ -20,6 +24,7 @@ function App() {
                 </div>
             );
         } else {
+            setStreak(0);
             toast.error(
                 <div className="flex flex-row justify-center w-full">
                     <h1 className="text-center text-2xl">
@@ -76,6 +81,9 @@ function App() {
                             <PokemonSkeleton />
                         </>
                     )}
+                </div>
+                <div className="pt-4">
+                    <h2>Your current streak is: {streak}</h2>
                 </div>
             </div>
         </>
